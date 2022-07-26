@@ -1,19 +1,46 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  Put,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
+
+import { CustomersService } from '../services/customers.service';
+import { CreateCustomerDto, UpdateCustomerDto } from '../dtos/customer.dtos';
 
 @Controller('customers')
 export class CustomersController {
+  constructor(private customersService: CustomersService) {}
+
   @Get()
-  getAll() {
-    return {
-      message: `Soy el controlador para customers`,
-    };
+  findAll() {
+    return this.customersService.findAll();
+  }
+
+  @Get(':id')
+  get(@Param('id', ParseIntPipe) id: number) {
+    return this.customersService.findOne(id);
   }
 
   @Post()
-  create(@Body() payload: any) {
-    return {
-      message: `acción de crear`,
-      payload,
-    };
+  create(@Body() payload: CreateCustomerDto) {
+    return this.customersService.create(payload);
+  }
+
+  @Put(':id')
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateCustomerDto,
+  ) {
+    return this.customersService.update(id, payload);
+  }
+
+  @Delete(':id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.customersService.remove(+id);
   }
 }
