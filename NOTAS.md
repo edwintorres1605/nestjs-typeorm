@@ -32,6 +32,13 @@ crear cada request -->
 <!-- Para usar los validadores en los pipelines, vamos a instalar unas dependencias con el servidor detenido. Primero detener el servidor y luego volverlo a ejecutar -->
 npm i class-validator class-transformer @nestjs/mapped-types
 
+<!-- Para consumir APIs con axios -->
+npm i --save @nestjs/axios
+
+y para usarlo se importa en el módulo que se va a usar:
+
+import { HttpModule } from '@nestjs/axios';
+
 <!-- Procedimiento para corregir error de Puerto en uso 
 si se llega a desconectar mal el servidor -->
 EL SERVIDOR SE DETIENE CON CTRL+C de manera correcta
@@ -57,3 +64,15 @@ nest g s services/users --flat
 
 <!-- Generar módulos -->
 nest g mo users
+
+<!-- Ahora dentro de cada módulo se crea la estructura que contenga:
+  controllers, dtos, entities y services -->
+
+
+<!-- USE VALUE: para inyectar valores que sirvan de manera global
+Ver el ejemplo realizado en el app.module.ts para API_KEY y el app.service.ts
+como en el ejemplo usamos variables de entorno para desarrollo, entonces
+detenemos el servidor y cambiamos la forma de ejecutarlo, así: -->
+NODE_ENV=prod npm run start:dev
+
+<!-- USE FACTORY:  -->

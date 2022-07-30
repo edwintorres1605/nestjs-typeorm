@@ -1,36 +1,35 @@
 import { Module } from '@nestjs/common';
+import { HttpModule, HttpService } from '@nestjs/axios';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ProductsController } from './controllers/products.controller';
-import { CategoriesController } from './controllers/categories.controller';
-import { UsersController } from './controllers/users.controller';
-import { CustomersController } from './controllers/customers.controller';
-import { BrandsController } from './controllers/brands.controller';
-import { ProductsService } from './services/products.service';
-import { CategoriesService } from './services/categories.service';
-import { BrandsService } from './services/brands.service';
-import { CustomersService } from './services/customers.service';
-import { UsersService } from './services/users.service';
 import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
+import { firstValueFrom } from 'rxjs';
+import { DatabaseModule } from './database/database.module';
+
+const API_KEY = '123456';
+const API_KEY_PROD = 'PROD14213423';
 
 @Module({
-  imports: [UsersModule, ProductsModule],
-  controllers: [
-    AppController,
-    ProductsController,
-    CategoriesController,
-    BrandsController,
-    CustomersController,
-    UsersController,
-  ],
+  imports: [HttpModule, UsersModule, ProductsModule, DatabaseModule],
+  controllers: [AppController],
   providers: [
     AppService,
-    ProductsService,
-    CategoriesService,
-    BrandsService,
-    CustomersService,
-    UsersService,
+    {
+      provide: 'API_KEY',
+      useValue: process.env.NODE_ENV === 'prod' ? API_KEY_PROD : API_KEY,
+    },
+    {
+      provide: 'TASKS',
+      useFactory: async (http: HttpService) => {
+        const response = http.get(
+          'https://jsonplaceholder.typicode.com/todos' /* API de ejemplo */,
+        );
+        const tasks = await firstValueFrom(response);
+        return tasks.data;
+      },
+      inject: [HttpService],
+    },
   ],
 })
 export class AppModule {}
