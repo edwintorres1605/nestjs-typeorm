@@ -130,5 +130,10 @@ y con el link que nos suministra ya tenemos un dominio con web inicial
 <!-- A continuación en los 3 archivos .env vamos a crear un puerto -->
 PORT = 3000
 
-<!-- Luego en el main.ts se modifica la linea correspondiente al puerto, y luego, teniendo detenido el servidor local, probamos con -->
+<!-- Luego en el main.ts se modifica la linea correspondiente al puerto, y luego, teniendo detenido el servidor local, probamos con heroku local web para probar que todo esté funcionando bien -->
 heroku local web
+
+<!-- Ahora vamos a hacer deployment, para eso debemos estar en la rama principal -->
+git push heroku main
+
+<!-- Para que funcione bien el link proporcionado en el deployment, debemos configurar las variables de entorno .env directamente en el dashboard de Heroku en settings, Reveal Config Vars-->
