@@ -9,14 +9,18 @@ import {
   Query,
   ParseIntPipe,
 } from '@nestjs/common';
-import { ProductsService } from './../services/products.service';
-import { CreateProductDto, UpdateProductDto } from '../dtos/product.dtos';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
+import { ProductsService } from './../services/products.service';
+import { CreateProductDto, UpdateProductDto } from '../dto/product.dto';
+
+@ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
   @Get()
+  @ApiOperation({ summary: 'List of Products' })
   getAll(
     @Query('limit') limit: number,
     @Query('offset') offset = 5,

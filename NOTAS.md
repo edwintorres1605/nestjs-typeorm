@@ -39,6 +39,19 @@ y para usarlo se importa en el módulo que se va a usar:
 
 import { HttpModule } from '@nestjs/axios';
 
+<!-- Para las variables de entorno (.env) vamos a instalar el siguiente paquete: -->
+npm i @nestjs/config
+
+Después de esto se crea el archivo .env para guardar las variables de entorno y se adicionan (*.env) al final del .gitignore
+
+<!-- Agregamos lo siguiente para validaciones -->
+npm install --save joi
+
+<!-- Para documentar la API vamos a usar Swagger, lo instalamos y configuramos en main.ts -->
+npm install --save @nestjs/swagger
+
+Para que Swagger pueda reconocer los archivos dtos es necesario ir al archivo nest-cli.json y modificarlo
+
 <!-- Procedimiento para corregir error de Puerto en uso 
 si se llega a desconectar mal el servidor -->
 EL SERVIDOR SE DETIENE CON CTRL+C de manera correcta
@@ -75,4 +88,47 @@ como en el ejemplo usamos variables de entorno para desarrollo, entonces
 detenemos el servidor y cambiamos la forma de ejecutarlo, así: -->
 NODE_ENV=prod npm run start:dev
 
-<!-- USE FACTORY:  -->
+<!-- Creamos 3 archivos para ambientes de trabajo: .env .stag.env .prod.env -->
+y luego le decimos al app.module que dependiendo del ambiente elija las variables
+correspondientes
+
+Pero primero creamos un archivo en src llamado environments.ts
+
+<!-- Para ejecutar cualquier ambiente creado se usa esto, cambiando el NODE_ENV: -->
+
+NODE_ENV=prod npm run start:dev
+
+<!-- Ahora vamos a crear un archivo de configuración config.ts en src para tipar -->
+
+<!-- Para que Swagger trabaje bien con los dtos debemos ir manualmente a cada uno y cambiar la improtación de PartialType ya no de mapped-types sino de swagger -->
+se detiene el servidor y se ejecuta la siguiente linea si no aparece la documentación
+
+rm -rf dist
+
+<!-- Habilitar CORS para que la Api sea accesible en main.ts -->
+app.enableCors(); <!-- Así queda abierta para cualquiera, dentro del paréntesis puedo poner las IP permitidas y restringir el acceso -->
+
+<!-- Deployment en Heroku -->
+<!-- En el package.json al final antes de la llave de cierre -->
+"engines": {
+  "node": "14.x"
+}
+
+<!-- Crear el archivo Procfile en la raíz para indicarle a Heroku la tarea que va a realizar para arrancar -->
+
+<!-- Instalar el paquete Heroku CLI y tener cuenta en Heroku -->
+brew tap heroku/brew && brew install heroku
+
+<!-- Después ejecutamos -->
+heroku login
+
+<!-- Luego creamos el proyecto -->
+heroku create
+
+y con el link que nos suministra ya tenemos un dominio con web inicial
+
+<!-- A continuación en los 3 archivos .env vamos a crear un puerto -->
+PORT = 3000
+
+<!-- Luego en el main.ts se modifica la linea correspondiente al puerto, y luego, teniendo detenido el servidor local, probamos con -->
+heroku local web
