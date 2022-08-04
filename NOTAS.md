@@ -140,3 +140,93 @@ git push heroku main
 
 <!-- Y FINALMENTE, NUESTRA WEB -->
 https://dry-chamber-02240.herokuapp.com/
+
+
+<!-- A PARTIR DE AQUÍ EMPIEZO CON TYPEORM -->
+
+<!-- Instalar Docker -->
+https://docs.docker.com/desktop/install/mac-install/
+
+<!-- Instalar en VSC la extensión YAML -->
+
+<!-- Luego se crea en la raíz el archivo docker-compose.yml -->
+
+<!-- Luego de escribir lo necesario en el docker-compose.yml vamos a correr la siguiente linea en la terminal para subir el contenedor -->
+docker-compose up -d postgres <!-- postgres aquí hace referencia a cómo llamamos el servicio dentro del archivo, en este caso postgres -->
+
+<!-- Para verificar que si esté corriendo docker en segundo plano: -->
+docker-compose ps 
+
+<!-- y se va ver algo así: -->
+          Name                         Command              State           Ports         
+------------------------------------------------------------------------------------------
+nestjs-typeorm_postgres_1   docker-entrypoint.sh postgres   Up      0.0.0.0:5432->5432/tcp
+
+<!-- Para bajar el contenedor: -->
+docker-compose down
+
+<!-- Agrego al gitignore la siguiente carpeta de los volumes -->
+/postgres_data
+
+<!-- Lo siguiente es ingresar remotamente, desde la terminal, al servidor para poder ejecutar instrucciones SQL -->
+docker-compose exec postgres bash
+
+<!-- Ahora debemos conectarnos a la base de datos -->
+psql -h localhost -d my_db -U root
+
+<!-- Para consultar las tablas que tenemos creadas -->
+\d+
+
+<!-- Para salir de la base de datos -->
+\q
+
+<!-- Para salir del servidor -->
+exit
+
+<!-- Para hacer lo mismo que lo anterior, que fue en terminal, lo podemos hacer también desde una interfaz pgadmin, la configuramos en el archivo docker-compose.yml y subimos el servicio a docker. Una vez hecho esto, abrimos el navegador localhost:5050 para abrir esa interfaz e ingresamos con las credenciales configuradas en el servicio -->
+
+<!-- Una vez dentro del pgAdmin, tenemos que crear la conexión al servidor -->
+Click en Servers del menú izquierdo, luego en el menú superior:
+Object > Register > Sever...
+En el formulario emergente, en la pestaña General:
+Name: my_db
+Luego en la pestaña Conections debemos ingresar la ip, para lo cual debemos ir a la terminal y ver la ip que le asignó docker a postgres:
+docker ps
+<!-- Tomamos el id y luego -->
+docker inspect b24e40bb5662<!-- aquí va el id, el id que está aquí es el que me arrojó la consulta -->
+<!-- y tomamos la ip donde dice IPAddress -->
+Host name/address: 172.19.0.2
+Luego en password ponemos el mismo de la conexión que tenemos en el docker-compose.yml, en este caso:
+Password: 123456
+Guardamos el password y click en el botón de abajo Save
+
+<!-- Una vez creada nuestra base de datos, damos click en el icono de bd para abrir el Query Editr y empezar a crear tablas, Ej. -->
+CREATE TABLE tasks (
+	id serial PRIMARY KEY,
+	title VARCHAR(255) NOT NULL,
+	completed BOOLEAN DEFAULT FALSE
+);
+
+<!-- Ahora vamos a conectar la bd a Nestjs -->
+npm install pg
+
+<!-- Como estamos trabajando con TypeScript es necesario instalar lo siguiente: -->
+npm i @types/pg -D
+
+<!-- Y ahora sí, la conexión en el database.module.ts y en los servicios las consultas a través de un método, y se crea el endpoint en el controlador, y dejamos las variables de conexión en variables de entorno. En el config.ts debemos configurar las variables de entorno -->
+
+<!-- Ahora pasamos al TypeORM, para instalarlo: -->
+npm install --save @nestjs/typeorm typeorm
+<!-- IMPORTANTE 👇 -->
+<!-- Hola, como en este momento ya hay nuevas versiones de las dependencias, al intentar seguir la clase me salieron errores, por eso me tocó actualizar primero las dependencias antes de instalar typeorm, de la siguiente forma: -->
+npm install -g npm-check-updates
+
+<!-- Esto pone a todas las dependencias en su última versión, ahora hay que modificarlas en el package.json así: -->
+ncu -u
+
+<!-- Y finalmente las instalamos: -->
+npm install
+
+<!-- Ahora sí se puede instalar typeorm: -->
+npm install --save @nestjs/typeorm typeorm
+
