@@ -230,3 +230,9 @@ npm install
 <!-- Ahora sí se puede instalar typeorm: -->
 npm install --save @nestjs/typeorm typeorm
 
+<!-- Ahora vamos a modificar las entidades para que se conviertan en algo usable por ORM -->
+
+<!-- Luego, dentro de cada módulo se importa TypeORM y se importan el módulo las entidades -->
+
+
+<!-- Ahora vamos a usar el patrón Repositories para administrar los servicios -->
