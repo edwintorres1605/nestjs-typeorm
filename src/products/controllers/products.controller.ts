@@ -45,7 +45,7 @@ export class ProductsController {
     return this.productsService.findOne(id);
   }
 
-  /*   @Post()
+  @Post()
   create(@Body() payload: CreateProductDto) {
     return this.productsService.create(payload);
   }
@@ -61,5 +61,5 @@ export class ProductsController {
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
     return this.productsService.delete(id);
-  } */
+  }
 }

@@ -28,12 +28,33 @@ export class ProductsService {
     return this.productRepo.find();
   }
 
-  findOne(id: number) {
-    const product = this.productRepo.findOneBy({ id: id });
+  async findOne(id: number) {
+    const product = await this.productRepo.findOneBy({ id: id });
     if (!product) {
       throw new NotFoundException(`Product #${id} not found`);
     }
     return product;
+  }
+
+  create(data: CreateProductDto) {
+    /*     const newProduct = new Product();
+    newProduct.name = data.name;
+    newProduct.description = data.description;
+    newProduct.price = data.price;
+    newProduct.stock = data.stock;
+    newProduct.image = data.image; */
+    const newProduct = this.productRepo.create(data);
+    return this.productRepo.save(newProduct);
+  }
+
+  async update(id: number, changes: UpdateProductDto) {
+    const product = await this.productRepo.findOneBy({ id: id });
+    this.productRepo.merge(product, changes);
+    return this.productRepo.save(product);
+  }
+
+  delete(id: number) {
+    return this.productRepo.delete(id);
   }
 
   /*   findAll() {

@@ -1,11 +1,44 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 import { Category } from '../entities/category.entity';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dto/category.dto';
 
 @Injectable()
 export class CategoriesService {
-  private counterId = 1;
+  constructor(
+    @InjectRepository(Category) private categoryRepo: Repository<Category>,
+  ) {}
+
+  findAll() {
+    return this.categoryRepo.find();
+  }
+
+  async findOne(id: number) {
+    const category = await this.categoryRepo.findOneBy({ id: id });
+    if (!category) {
+      throw new NotFoundException(`Category #${id} not found`);
+    }
+    return category;
+  }
+
+  create(data: CreateCategoryDto) {
+    const newCategory = this.categoryRepo.create(data);
+    return this.categoryRepo.save(newCategory);
+  }
+
+  async update(id: number, changes: UpdateCategoryDto) {
+    const category = await this.categoryRepo.findOneBy({ id: id });
+    this.categoryRepo.merge(category, changes);
+    return this.categoryRepo.save(category);
+  }
+
+  delete(id: number) {
+    return this.categoryRepo.delete(id);
+  }
+
+  /* private counterId = 1;
   private categories: Category[] = [
     {
       id: 1,
@@ -52,5 +85,5 @@ export class CategoriesService {
     }
     this.categories.splice(index, 1);
     return true;
-  }
+  } */
 }
