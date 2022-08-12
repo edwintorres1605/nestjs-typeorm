@@ -236,3 +236,14 @@ npm install --save @nestjs/typeorm typeorm
 
 
 <!-- Ahora vamos a usar el patrón Repositories para administrar los servicios -->
+
+<!-- MIGRACIONES
+
+Hasta ahora tenemos activo synchronyze = true en nuestro databse.module.ts pero esta es una buena práctica únicamente para ambientes productivos o de testing. Para producción son mejor las migraciones -->
+
+<!-- Creo las variables de entorno en .env -->
+
+<!-- En los scripts del package.json adiciono la siguiente linea de comandos -->
+"typeorm": "typeorm-ts-node-commonjs tsconfig-paths/register",
+"migrations:generate": "npm run typeorm migration:generate -- -n" <!-- después de esta linea al ejecutar irá el nombre de la migración -->
+
