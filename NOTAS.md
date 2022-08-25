@@ -244,6 +244,14 @@ Hasta ahora tenemos activo synchronyze = true en nuestro databse.module.ts pero 
 <!-- Creo las variables de entorno en .env -->
 
 <!-- En los scripts del package.json adiciono la siguiente linea de comandos -->
-"typeorm": "typeorm-ts-node-commonjs tsconfig-paths/register",
-"migrations:generate": "npm run typeorm migration:generate -- -n" <!-- después de esta linea al ejecutar irá el nombre de la migración -->
+    "typeorm": "typeorm-ts-node-commonjs -d src/database/dataSource.ts",
+    "migration:generate": "npm run typeorm migration:generate -- src/database/migrations/init",
+    "migration:run": "npm run typeorm migration:run",
+    "migration:show": "npm run typeorm migration:show",
+    "migration:revert": "npm run typeorm migration:revert"
 
+<!-- Para generar migraciones se debe correr... -->
+ npm run migration:generate 
+
+<!-- Y para subir las tablas con la respectiva tabla de migraciones también: -->
+ npm run migration:run

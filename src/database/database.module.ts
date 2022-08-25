@@ -24,7 +24,7 @@ const API_KEY_PROD = 'PROD14213423';
           password,
           database: dbName,
           synchronize:
-            true /* Esto es útil para ir creando las tablas que tenemos en las
+            false /* Esto es útil para ir creando las tablas que tenemos en las
             entidades, en producción debe estar en false */,
           autoLoadEntities: true,
         };
