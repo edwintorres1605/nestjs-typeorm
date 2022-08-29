@@ -245,13 +245,201 @@ Hasta ahora tenemos activo synchronyze = true en nuestro databse.module.ts pero 
 
 <!-- En los scripts del package.json adiciono la siguiente linea de comandos -->
     "typeorm": "typeorm-ts-node-commonjs -d src/database/dataSource.ts",
-    "migration:generate": "npm run typeorm migration:generate -- src/database/migrations/init",
+    "migration:generate": "npm run typeorm migration:generate --",
     "migration:run": "npm run typeorm migration:run",
     "migration:show": "npm run typeorm migration:show",
     "migration:revert": "npm run typeorm migration:revert"
 
 <!-- Para generar migraciones se debe correr... -->
- npm run migration:generate 
+ npm run migration:generate src/database/migrations/init
 
 <!-- Y para subir las tablas con la respectiva tabla de migraciones también: -->
  npm run migration:run
+
+<!-- Cada vez que realice modificaciones en la base de datos y desee añadir migraciones, simplemente se ejecuta el generate cambiando el init por un nombre relacionado a la migración, por ejemplo: -->
+ npm run migration:generate src/database/migrations/add-fields
+
+
+<!-- RELACIONES -->
+<!-- Relación 1:1 -->
+Se importan de typeorm OneToOne, JoinColumn y además se debe importar la entidad relacionada y añadimos el atributo de la relación, por ejemplo en la tabla users podemos relacionar si tienen un cliente relacionado
+
+  @OneToOne(() => Customer, (customer) => customer.user, { nullable: true })
+  @JoinColumn()
+  customer: Customer;
+
+Y ahora hacemos la relación bidireccional, para que saber cuál es el usuario de cada cliente si lo tiene en la entidad customers
+
+Se importa únicamente OneToOne y la entidad User y se agrega la propiedad user
+
+  @OneToOne(() => User, (user) => user.customer, { nullable: true })
+  user: User;
+
+En la relación uno a uno no importa en cuál entidad va el JoinColumn, lo importante es que una si lo tenga.
+
+<!-- Ahora vamos a resolver la relación uno a uno desde el servicio -->
+Para esto se modifica el dto agregando:
+
+  @ApiProperty()
+  @IsPositive()
+  @IsOptional()
+  readonly customerId: number;
+
+Y luego vamos a modificar el servicio. Primero, importo el CustomerService y lo agrego al constructor, luego modifico el método create para que valide si el usuario tiene un cliente relacionado y de ser así lo agregue. También debo modificar el método findAll para que muestre la relación al consultar los usuarios.
+
+<!-- Relación 1:n -->
+importamos ManyToOne en la entidad débil, que para el caso de la relación productos y marcas sería la tabla products. En esta tabla también importamos la entidad Brand y agregamos el atributo:
+
+  @ManyToOne(() => Brand, (brand) => brand.products)
+  brand: Brand;
+
+Y en la entidad fuerte que es brands, importamos OneToMany, importamos la entidad Product y agregamos el atributo:
+
+  @OneToMany(() => Product, (product) => product.brand)
+  products: Product[];
+
+<!-- Ahora vamos a resolver la relación 1:n desde el servicio -->
+Vamos al dto de product y agregamos:
+
+  @IsNotEmpty()
+  @ApiProperty()
+  @IsPositive()
+  readonly brandId: number;
+
+Y luego en el service de products hacemos las respectivas modificaciones.
+También se modifica el service de brands para consultar los productos relacionados por marca en el findOne
+
+<!-- Relaciones n:n -->
+Categories and products
+El JoinTable debe ir en una de las dos entidades sin importar en cuál
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- ********* APORTE INTERESANTE PARA HACER CRUD COMPARTIDO POR UN COMPAÑERO DEL CURSO -->
+He creado dos snippets de VS Code para crear un Servicio y un Controller básico mucho más rápido. (para hacer lo que el profe hace en cámara rápida).
+
+Para crearlos van a:
+
+File
+Preferences
+User Snippets
+Buscan typescript
+En el archivo JSON que se les abrió copian este código dentro de las llaves:
+
+Servicio
+	"Create NestJS Service": {
+		"prefix": "nest:s",
+		"body": [
+			"import { Injectable, NotFoundException } from '@nestjs/common';",
+			"import { InjectRepository } from '@nestjs/typeorm';",
+			"import { Repository } from 'typeorm';",
+			"",
+			"import { $2 } from '${1:entity-route}';",
+			"import { ${4:createDto}, ${5:updateDto} } from '${3:dto-route}';",
+			"",
+			"@Injectable()",
+			"export class ${6:serviceName}Service {",
+			"  constructor(",
+			"    @InjectRepository($2)",
+			"    private ${7:repo}: Repository<$2>,",
+			"  ) {}",
+			"${0}",
+			"  async findAll() {",
+			"    return await this.$7.find();",
+			"  }",
+			"",
+			"  async findOne(id: number) {",
+			"    const ${8:object} = await this.$7.findOne(id);",
+			"    if (!$8) throw new NotFoundException(`${9:object} not found.`);",
+			"    return $8;",
+			"  }",
+			"",
+			"  async create(data: $4) {",
+			"    const ${10:newObject} = this.$7.create(data);",
+			"    return await this.$7.save($10);",
+			"  }",
+			"",
+			"  async update(id: number, changes: $5) {",
+			"    const $8 = await this.findOne(id);",
+			"    this.$7.merge($8, changes);",
+			"    return await this.$7.save($8);",
+			"  }",
+			"",
+			"  async remove(id: number) {",
+			"    return await this.$7.delete(id);",
+			"  }",
+			"}",
+		],
+		"description": "This service has a basic CRUD implemented"
+	},
+Controller
+"Create NestJS Controller": {
+		"prefix": "nest:co",
+		"body": [
+			"import {",
+			"  Controller,",
+			"  Get,",
+			"  Post,",
+			"  Put,",
+			"  Body,",
+			"  Param,",
+			"  Delete,",
+			"  ParseIntPipe,",
+			"} from '@nestjs/common';",
+			"import { ApiTags } from '@nestjs/swagger';",
+			"",
+			"import { ${2:serviceName} } from '${1:service-route}';",
+			"import { ${4:createDto}, ${5:updateDto} } from '${3:dto-route}';",
+			"",
+			"@ApiTags('${6:controllerName}')",
+			"@Controller('$6')",
+			"export class ${7:controllerNameInUppercase}Controller {",
+			"  constructor(private ${8:serviceName}: $2) {}",
+			"",
+			"  @Get()",
+			"  async findAll() {",
+			"    return await this.$8.findAll();",
+			"  }",
+			"",
+			"  @Get('/:id')",
+			"  async getCategory(@Param('id') id: number) {",
+			"    return await this.$8.findOne(id);",
+			"  }",
+			"",
+			"  @Post()",
+			"  async create(@Body() payload: $4) {",
+			"    return await this.$8.create(payload);",
+			"  }",
+			"",
+			"  @Put('/:id')",
+			"  async update(",
+			"    @Param('id', ParseIntPipe) id: number,",
+			"    @Body() payload: $5,",
+			"  ) {",
+			"    return await this.$8.update(id, payload);",
+			"  }",
+			"",
+			"  @Delete('/:id')",
+			"  async remove(@Param('id', ParseIntPipe) id: number) {",
+			"    return await this.$8.remove(id);",
+			"  }",
+			"}",
+		],
+		"description": "This controller has a basic CRUD implemented"
+	}
+Para usarlos simplemente tienen que crear su servicio/controlador normalmente y borrar lo que hay ahí.
+Luego simplemente ponen nest:s o nest:co y empiezan a llenar todos los datos que se pide.
+Para avanzar solo precionen la tecla tab
+
+Espero les sirva! 😃
